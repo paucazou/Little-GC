@@ -15,9 +15,9 @@ It's pretty straightforward.
  * - the class 'lgc' (little garbage collector)
  * - the factory, that you should use, 'gc'
  */
-using lgc_user;
+using namespace lgc_user;
 
-lgc<std::string> f_that_creates_a_string(const char[] s) {
+lgc<std::string> f_that_creates_a_string(const char s[]) {
   /* This function creates a standard string with the given
    * c-style string. As you can see,
    * the string does not go out of scope at the end of the function.
