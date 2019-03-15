@@ -47,8 +47,9 @@ int main () {
   }
 ```
 ## What you should not do
-* Never ever call `delete` with a lgc or a lgc member: always let the Garbage Collector do his job.
+* Never ever call `delete` with a lgc or a lgc member: always let the Garbage Collector do its job.
 * Do not use any class, function or other which is not in the user namespace.
+* Do not use any array with the Garbage Collector. Seriously, who whants to use so low-level tools like arrays with a garbage collector? 
 * Do not use this library. Instead, learn to use pointers correctly and so-called smart pointers.
 ## When is garbage destroyed?
 This is one issue of the Garbage Collector in general: when does the GC do its work?

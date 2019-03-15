@@ -41,7 +41,7 @@ namespace little_gc {
 					return *_ptr;
 				}
 
-				T* operator -> () {
+				T* operator -> () const{
 					return _ptr;
 				}
 			private:
