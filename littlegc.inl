@@ -20,6 +20,13 @@ namespace little_gc {
 				{
 				}
 
+				LittleGC (const T&& elt) :
+					_ref { getReferencer<T>() },
+					_id {_ref.firstTimeConstruction(std::move(elt))},
+					_ptr{_ref.getPtr(_id)}
+				{
+				}
+
 				LittleGC (const LittleGC<T>& other) :
 					 _ref{other._ref},
 					_id{other._id},
@@ -30,6 +37,23 @@ namespace little_gc {
 
 				~LittleGC() {
 					_ref.notifyDestruction(_id);
+				}
+
+				LittleGC<T>& operator = (const LittleGC<T>& other) {
+					/* Increments the references count by one
+					 * for other, but decrements it for this before
+					 * copy
+					 */
+					// decrements current data count
+					_ref.notifyDestruction(_id);
+					// copy data references
+					_id = other._id;
+					_ptr = other._ptr;
+					// no need to copy _ref since it is supposed
+					// to be the same for other
+					// increments the current data count
+					_ref.notifyCopy(_id);
+					return *this;
 				}
 
 				T& operator *() {
@@ -57,6 +81,12 @@ namespace little_gc {
 			 * with this one
 			 */
 			return LittleGC<T>(elt);
+		}
+	template <typename T>
+		const LittleGC<T> gc(const T&& elt) {
+			/* Overloaded move factory
+			 */
+			return LittleGC<T>(std::move(elt));
 		}
 
 	template <typename T>

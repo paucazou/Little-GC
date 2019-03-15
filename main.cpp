@@ -27,14 +27,22 @@ int main () {
   
   // other syntax
   auto str2 { gc<std::string>("ok") };
+
+  // works with std::move
+  int y { 12 };
+  auto y_moved { gc(std::move(y)) };
   
   // dereference it with the * operator, as a pointer
   *str = "not ok";
-  std::cout << *str2;
+  std::cout << *str2; // 'ok'
   
   // if the object has members, you can use them
   // with the '->' operator
-  std::cout << str->size();
+  std::cout << str->size(); // '6'
+
+  // you can add a copy of references of the same type
+  str = str2; // content of str is destroyed; content of str2 has two references
+  std::cout << *str; // 'ok'
   
   return 0;
   }
