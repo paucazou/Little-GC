@@ -14,6 +14,6 @@ compile () {
 	-D DEBUG\
 	-g\
 	main.cpp\
-	-o out
+	-o a.out
 }
 
