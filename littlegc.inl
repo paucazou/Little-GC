@@ -44,15 +44,36 @@ namespace little_gc {
 					 * for other, but decrements it for this before
 					 * copy
 					 */
-					// decrements current data count
-					_ref.notifyDestruction(_id);
+					if (other == *this)
+						return *this;
+					// save the old id in a temporary variable
+					auto old_id { _id };
 					// copy data references
 					_id = other._id;
 					_ptr = other._ptr;
 					// no need to copy _ref since it is supposed
 					// to be the same for other
+					
 					// increments the current data count
+					// and decrements the old one. We do that here
+					// for the case other points actually to the same data
 					_ref.notifyCopy(_id);
+					_ref.notifyDestruction(old_id);
+					return *this;
+				}
+
+				LittleGC<T>& operator = (const LittleGC<T>&& other) {
+					/* Move assignment. See copy assignment for details
+					 */
+					if (other == *this)
+						return *this;
+
+					auto old_id { _id };
+					_id = std::move(other._id);
+					_ptr = std::move(other._ptr);
+
+					_ref.notifyCopy(_id);
+					_ref.notifyDestruction(old_id);
 					return *this;
 				}
 
@@ -65,7 +86,18 @@ namespace little_gc {
 					return *_ptr;
 				}
 
+				bool operator == (const LittleGC<T>& other) const{
+					/* true if other points to the same data
+					 */
+					return other._id == _id && other._ptr == _ptr;
+				}
+
+				bool operator != (const LittleGC<T>& other) const{
+					return !(other == *this);
+				}
+
 				T* operator -> () const{
+					assert(_ptr&&"_ptr is a NULL pointer");
 					return _ptr;
 				}
 			private:
@@ -87,6 +119,14 @@ namespace little_gc {
 			/* Overloaded move factory
 			 */
 			return LittleGC<T>(std::move(elt));
+		}
+
+	template <typename T>
+		const LittleGC<T> gc() {
+			/* Overloaded factory. Calls the default
+			 * constructor
+			 */
+			return LittleGC<T>( T() );
 		}
 
 	template <typename T>
