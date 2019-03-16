@@ -109,5 +109,7 @@ This is one issue of the Garbage Collector in general: when does the GC do its w
 Little Garbage Collector destroys the data (frees them, actually) when the last reference of a variable is destroyed. Each destruction of a reference or each copy notifies the instance in charge of counting the references and, when the last reference is destroyed, or when it receives another value, the count of references is equal to 0 and the memory is freed.
 ## Tests
 I've got no time to make tests. I compiled it with Clang and GCC, with all warnings and used Valgrind at runtime. It works. Do the same or write tests if you're so bored that you've got nothing better to do. Pull requests are accepted.
+## Known issues
+* Circular references will not be freed.
 ```c++
 ```
