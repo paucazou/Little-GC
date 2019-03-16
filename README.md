@@ -1,18 +1,19 @@
 # Little-GC
 A toy garbage collector for C++
 ## What is Little-GC?
-It's just a toy project that implements a Garbage Collector for C++. Don't use it, except for toy projects.
+It's just a toy project that implements a Garbage Collector for C++. This library is fully templated. Don't use it, except for toy projects.
 ## Usage
 It's pretty straightforward.
 ### Adding the library to your project
-Copy the two files *littlegc.inl* and *referencer.inl*. Include the first one in every place where it is necessary.
+Copy the two files *littlegc.inl* and *data.inl*. Include the first one in every place where it is necessary.
 ```c++
 #include "littlegc.inl"
 ```
 ### Namespaces
-The library defines a user namespace called *lgc_user*. Two names are defined inside this namespace:
+The library defines a user namespace called *lgc_user*. Three names are defined inside this namespace:
 * lgc : (which stands for Little Garbage Collector), a templated class that represents a variable (or, more accuratly, a reference)
 * gc : a factory that you should use to create *lgc*
+* gce : a factory that allows you to constructs to emplace the object directory without rvalue copy.
 We strongly discourage you to use elements which are in other namespaces. We also suggest the usage of the *using* statement:
 ```c++
 using namespace lgc_user;
@@ -31,6 +32,9 @@ auto str { gc(std::move(s)) };
 
 // you can also create an empty value
 auto str { gc<std::string>() };
+
+// you can emplace the object without copy
+auto str { gce<std::string>("String") };
 ```
 ### Using underlying values
 Using underlying values is pretty easy: use the * operator to get a reference to the object, and the -> operator to access one of its members.
@@ -71,6 +75,29 @@ s == s2; // true
 s == s3; // false
 s != s2; // false
 s != s3; // true
+```
+### The assignment operator
+The assignment operator may be a little bit difficult to understand. We can see three different possibilities.
+#### Using the assignment of the underlying value thanks to the * operator.
+In this case, it is the underlying value itself which is modified. Every reference to the value will return the modified one.
+```c++
+auto i { gc<int>(42) };
+auto j { i }; // j points to 42
+*i = 24; // *i == *j == 24
+```
+#### Using the assignment operator with a 'lgc' argument
+In this case, the 'lgc' points now to the new value, but every other reference to the old one continue to point to the old value.
+```c++
+auto i { gc<int>(42) };
+auto j { i }; // j points to 42
+i = gc<int>(45); // j points to 42; i points to 45;
+```
+#### Using the assignment operator with a T value
+In this case, the behaviour will be the same than when dealing with an lgc value.
+```c++
+auto i { gc<int>(42) };
+auto j { i }; // j points to 42
+i = 45; // j points to 42, i points to 45
 ```
 ## What you should not do
 * Never ever call `delete` with a lgc or a lgc member: always let the Garbage Collector do its job.
